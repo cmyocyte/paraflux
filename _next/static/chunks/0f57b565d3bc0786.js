@@ -451,30 +451,30 @@ void main() {
         color += green3 * smoothstep(0.0, 0.8, n1 + 0.3) * 0.12;
 
         // === Layer 2: Parabolic curves — clean, mathematical ===
-        // Back layer (slow, dim)
-        for (int i = -4; i <= 4; i++) {
+        // Back layer — 5 widely spaced curves
+        for (int i = -2; i <= 2; i++) {
           float fi = float(i);
-          float shift = fi * 0.28 + sin(t * 1.5 + fi * 0.6) * 0.12;
+          float shift = fi * 0.45 + sin(t * 1.5 + fi * 0.6) * 0.1;
           float scale = 0.7 + sin(t * 0.8 + fi * 0.4) * 0.1;
           float curve = (uv.x + m.x * 0.5) * (uv.x + m.x * 0.5) * scale + shift - uv.y;
           float glow = 0.003 / (abs(curve) + 0.003);
           float fade = exp(-dot(uv, uv) * 0.25);
-          color += green2 * glow * fade * 0.4;
+          color += green2 * glow * fade * 0.35;
         }
 
-        // Front layer (sharper, brighter, mouse-reactive)
-        for (int i = -5; i <= 5; i++) {
+        // Front layer — 7 curves, wider spacing, mouse-reactive
+        for (int i = -3; i <= 3; i++) {
           float fi = float(i);
-          float shift = fi * 0.2 + sin(t * 3.0 + fi * 0.9) * 0.06;
+          float shift = fi * 0.35 + sin(t * 3.0 + fi * 0.9) * 0.05;
           float scale = 0.95 + sin(t * 1.2 + fi * 0.5) * 0.12;
 
           // Mouse displaces the curves
           vec2 p = uv - m * 0.4;
           float curve = p.x * p.x * scale + shift - p.y;
-          float glow = 0.0025 / (abs(curve) + 0.0025);
+          float glow = 0.002 / (abs(curve) + 0.002);
           float fade = exp(-dot(uv, uv) * 0.3);
 
-          // Color varies per curve — shifts between green shades
+          // Color varies per curve
           vec3 curveColor = mix(green1, green2, sin(fi * 0.7 + t) * 0.5 + 0.5);
           color += curveColor * glow * fade * 0.45;
         }
