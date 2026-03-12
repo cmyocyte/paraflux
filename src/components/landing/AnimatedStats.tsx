@@ -12,10 +12,10 @@ interface Stat {
 }
 
 const STATS: Stat[] = [
-  { value: "$600B+", label: "Daily TradFi Vol Trading" },
-  { value: "~$50M", label: "Daily DeFi Options" },
-  { value: "0", label: "On-Chain Vol Markets" },
-  { value: "S²", label: "The Fix" },
+  { value: "2", numericValue: 2, label: "Instruments" },
+  { value: "0", numericValue: 0, label: "Expiries or Strikes" },
+  { value: "75%", numericValue: 75, suffix: "%", label: "Fees to LPs" },
+  { value: "1", numericValue: 1, label: "Unified Pool" },
 ];
 
 function Counter({ target, duration = 1.5 }: { target: number; duration?: number }) {
@@ -55,7 +55,11 @@ export function AnimatedStats() {
         >
           <p className="font-mono text-2xl font-bold text-white">
             {triggered && stat.numericValue !== undefined ? (
-              <Counter target={stat.numericValue} />
+              <>
+                {stat.prefix}
+                <Counter target={stat.numericValue} />
+                {stat.suffix}
+              </>
             ) : (
               stat.value
             )}

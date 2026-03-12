@@ -8,12 +8,12 @@ const FAQ_ITEMS = [
   {
     question: "How do I earn yield?",
     answer:
-      "The vault collects 75% of all trading fees. When traders open, close, or get liquidated, fees flow into the vault, increasing the value of your LP shares. You also earn from the funding rate when longs pay shorts (the majority of the time in bullish markets).",
+      "The vault collects 75% of all trading fees from both power perps and variance swaps. When traders open, close, or get liquidated on either product, fees flow into the vault, increasing the value of your LP shares. You also earn from funding rates on both products. Diversified income — vol spikes that hurt one side often benefit the other.",
   },
   {
     question: "What are the risks?",
     answer:
-      "The vault is the counterparty to all traders. If traders are collectively profitable, the vault value decreases. However, the protocol has an insurance fund as a first-loss buffer, and historically most leveraged perp traders lose money net of fees.",
+      "The vault is the counterparty to all traders across power perps and variance swaps. If traders are collectively profitable, the vault value decreases. However, the two products provide natural diversification — power perp risk is directional while var swap risk is pure vol — and the protocol has an insurance fund as a first-loss buffer.",
   },
   {
     question: "What is the cooldown?",

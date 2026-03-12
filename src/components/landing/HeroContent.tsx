@@ -29,21 +29,13 @@ export function HeroContent() {
         className="font-display text-6xl font-bold tracking-tight text-white drop-shadow-lg sm:text-8xl"
         variants={fadeUp}
       >
-        Su<span className="text-[#22c55e]">perps</span>
+        Para<span className="text-[#22c55e]">flux</span>
       </motion.h1>
       <motion.p
         className="mt-4 font-display text-xl font-medium tracking-wide text-zinc-300 drop-shadow-md"
         variants={fadeUp}
       >
-        Not a Perp DEX. The On-Chain Volatility Market.
-      </motion.p>
-      <motion.p
-        className="mx-auto mt-6 max-w-xl text-base leading-7 text-zinc-400 drop-shadow-sm"
-        variants={fadeUp}
-      >
-        DeFi has $5B/day in linear perps and almost zero volatility trading.
-        Power perpetuals fix that — option-like convexity, perp-like liquidity,
-        no strikes, no expiries. One instrument. Built on Hyperliquid.
+        The On-Chain Volatility Layer.
       </motion.p>
       <motion.div
         className="mt-12 flex items-center justify-center gap-5"

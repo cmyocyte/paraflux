@@ -25,8 +25,8 @@ export type TradeEvent = {
   timestamp: number;
 };
 
-const STORAGE_KEY = "superps_trade_history";
-const LAST_SCANNED_KEY = "superps_liq_last_block";
+const STORAGE_KEY = "paraflux_trade_history";
+const LAST_SCANNED_KEY = "paraflux_liq_last_block";
 
 /** Max blocks per getLogs RPC call (HyperEVM limit) */
 const RPC_MAX_RANGE = 1000n;

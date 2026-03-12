@@ -45,7 +45,7 @@ export function TerminalDemo() {
           <div className="h-2.5 w-2.5 rounded-full bg-[#3fb950]/60" />
         </div>
         <span className="ml-2 font-mono text-[10px] tracking-wide text-zinc-600">
-          superps
+          paraflux
         </span>
       </div>
 

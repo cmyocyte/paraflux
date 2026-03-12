@@ -17,7 +17,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Superps | Power Perpetuals on HyperEVM",
+  title: "Paraflux | The On-Chain Volatility Layer",
   description:
     "Trade the squared HYPE payoff. Leveraged convexity exposure with peer-to-pool liquidity on HyperEVM.",
 };

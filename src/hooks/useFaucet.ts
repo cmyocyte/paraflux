@@ -11,7 +11,7 @@ import { CONTRACTS } from "@/config/contracts";
 import { mockUsdcAbi } from "@/lib/abi/MockUSDC";
 
 const CLAIM_AMOUNT = 10_000n * 1_000_000n; // 10,000 USDC (6 decimals)
-const COOLDOWN_KEY = "superps_faucet_last_claim";
+const COOLDOWN_KEY = "paraflux_faucet_last_claim";
 const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export function useFaucet() {

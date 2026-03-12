@@ -4,7 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
 const W = 320;
-const H = 160;
+const H = 190;
 const PAD = 30;
 
 // Generate points for the curves
@@ -43,7 +43,7 @@ export function PayoffCurveMini() {
     <svg
       ref={ref}
       viewBox={`0 0 ${W} ${H}`}
-      className="mx-auto w-full max-w-xs"
+      className="mx-auto w-full max-w-lg"
       fill="none"
     >
       {/* Axes */}
@@ -72,12 +72,11 @@ export function PayoffCurveMini() {
         P&L
       </text>
 
-      {/* Linear 2x — dashed, dim */}
+      {/* Linear 2x — solid, dim */}
       <motion.path
         d={linearPath}
         stroke="#4b5563"
         strokeWidth={1.5}
-        strokeDasharray="4 4"
         initial={{ pathLength: 0 }}
         animate={isInView ? { pathLength: 1 } : {}}
         transition={{ duration: 1.2, ease: "easeOut" }}
@@ -99,13 +98,13 @@ export function PayoffCurveMini() {
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 1.5, duration: 0.4 }}
       >
-        <line x1={PAD + 4} y1={H - 10} x2={PAD + 20} y2={H - 10} stroke="#4b5563" strokeWidth={1.5} strokeDasharray="4 4" />
-        <text x={PAD + 24} y={H - 7} className="fill-zinc-500 text-[8px]">
+        <line x1={W - PAD - 68} y1={H - 16} x2={W - PAD - 52} y2={H - 16} stroke="#4b5563" strokeWidth={1.5} />
+        <text x={W - PAD - 48} y={H - 13} className="fill-zinc-500 text-[8px]">
           Linear 2x
         </text>
-        <line x1={PAD + 84} y1={H - 10} x2={PAD + 100} y2={H - 10} stroke="#22c55e" strokeWidth={2} />
-        <text x={PAD + 104} y={H - 7} className="fill-[#22c55e] text-[8px]">
-          Superps 2x
+        <line x1={W - PAD - 68} y1={H - 4} x2={W - PAD - 52} y2={H - 4} stroke="#22c55e" strokeWidth={2} />
+        <text x={W - PAD - 48} y={H - 1} className="fill-[#22c55e] text-[8px]">
+          Paraflux 2x
         </text>
       </motion.g>
     </svg>

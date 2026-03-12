@@ -34,7 +34,7 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <span className="font-display text-lg font-bold tracking-tight text-white">
-            Su<span className="text-[#22c55e]">perps</span>
+            Para<span className="text-[#22c55e]">flux</span>
           </span>
         </Link>
 

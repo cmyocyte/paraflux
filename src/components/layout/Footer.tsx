@@ -6,17 +6,17 @@ export function Footer() {
           {/* Logo + tagline */}
           <div>
             <p className="font-display text-sm font-bold text-white">
-              Su<span className="text-[#22c55e]">perps</span>
+              Para<span className="text-[#22c55e]">flux</span>
             </p>
             <p className="mt-1 text-xs text-zinc-600">
-              Power Perpetuals on HyperEVM
+              The On-Chain Volatility Layer
             </p>
           </div>
 
           {/* Links */}
           <div className="flex gap-8">
             <a
-              href="https://github.com/cmyocyte/superps"
+              href="https://github.com/cmyocyte/paraflux"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
@@ -49,8 +49,8 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-8 border-t border-[#21262d]/50 pt-6 text-center">
           <p className="text-[11px] text-zinc-700">
-            Superps is experimental software. Smart contracts are immutable and
-            unaudited by external firms. Use at your own risk.
+            Paraflux is experimental software. Smart contracts are immutable and
+            only internally audited. Use at your own risk.
           </p>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const REFERRAL_KEY = "superps_referral_code";
+const REFERRAL_KEY = "paraflux_referral_code";
 
 export function useReferral() {
   const searchParams = useSearchParams();

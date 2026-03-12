@@ -12,8 +12,8 @@ export function PayoffCalculator() {
 
   const rows = [
     { label: "Regular 2x", value: 2 * (hypeChange / 100) * 100 },
-    { label: "Superps 2x", value: 2 * indexChange * 100 },
-    { label: "Superps 3x", value: 3 * indexChange * 100 },
+    { label: "Paraflux 2x", value: 2 * indexChange * 100 },
+    { label: "Paraflux 3x", value: 3 * indexChange * 100 },
   ];
 
   const maxAbs = Math.max(...rows.map((r) => Math.abs(r.value)), 1);
@@ -93,8 +93,8 @@ export function PayoffCalculator() {
               ? 0
               : Math.max((Math.abs(row.value) / maxAbs) * 100, 14);
           const display = row.value.toFixed(1);
-          const isSuperps3 = row.label === "Superps 3x";
-          const isSuperps = row.label.startsWith("Superps");
+          const isParaflux3 = row.label === "Paraflux 3x";
+          const isParaflux = row.label.startsWith("Paraflux");
 
           return (
             <div key={row.label} className="flex items-center gap-4">
@@ -110,14 +110,14 @@ export function PayoffCalculator() {
                   <div
                     className={`flex h-full items-center rounded-lg px-4 font-mono text-sm font-bold transition-all duration-300 ease-out ${
                       positive
-                        ? isSuperps3
+                        ? isParaflux3
                           ? "bg-gradient-to-r from-[#22c55e]/25 to-[#22c55e]/10 text-[#22c55e] shadow-[inset_0_0_30px_rgba(34,197,94,0.08)]"
-                          : isSuperps
+                          : isParaflux
                             ? "bg-gradient-to-r from-[#22c55e]/15 to-[#22c55e]/5 text-[#22c55e]/80"
                             : "bg-[#21262d]/80 text-zinc-400"
-                        : isSuperps3
+                        : isParaflux3
                           ? "bg-gradient-to-r from-red-500/20 to-red-500/5 text-red-400 shadow-[inset_0_0_30px_rgba(239,68,68,0.06)]"
-                          : isSuperps
+                          : isParaflux
                             ? "bg-gradient-to-r from-red-500/12 to-red-500/5 text-red-400/80"
                             : "bg-[#21262d]/80 text-zinc-400"
                     }`}
@@ -137,7 +137,7 @@ export function PayoffCalculator() {
       <p className="mt-8 text-center text-xs leading-5 text-zinc-600">
         {hypeChange > 0 ? (
           <>
-            At +{hypeChange}%, Superps 2x returns{" "}
+            At +{hypeChange}%, Paraflux 2x returns{" "}
             <span className="font-mono text-[#22c55e]">
               +{rows[1].value.toFixed(1)}%
             </span>{" "}
@@ -149,7 +149,7 @@ export function PayoffCalculator() {
           </>
         ) : hypeChange < 0 ? (
           <>
-            Squared payoff amplifies losses too. Superps 2x loses{" "}
+            Squared payoff amplifies losses too. Paraflux 2x loses{" "}
             <span className="font-mono text-red-400">
               {rows[1].value.toFixed(1)}%
             </span>{" "}
