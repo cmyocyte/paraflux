@@ -1,9 +1,9 @@
 1:"$Sreact.fragment"
 2:I[47257,["/paraflux/_next/static/chunks/ff1a16fafef87110.js","/paraflux/_next/static/chunks/d2be314c3ece3fbe.js"],"ClientPageRoot"]
-3:I[13979,["/paraflux/_next/static/chunks/23565eba8845a89e.js","/paraflux/_next/static/chunks/df5534e9165c4f8e.js","/paraflux/_next/static/chunks/1cf3ac55b798e2c8.js","/paraflux/_next/static/chunks/87ddec9995f9b352.js","/paraflux/_next/static/chunks/a4dd01b6d97ead39.js","/paraflux/_next/static/chunks/57592f28b2814f18.js","/paraflux/_next/static/chunks/0c4d01c917817b35.js","/paraflux/_next/static/chunks/16297f540513d0da.js"],"default"]
+3:I[13979,["/paraflux/_next/static/chunks/be51ac2c6fcc5ab9.js","/paraflux/_next/static/chunks/1cf3ac55b798e2c8.js","/paraflux/_next/static/chunks/23565eba8845a89e.js","/paraflux/_next/static/chunks/13cad4c26f360227.js","/paraflux/_next/static/chunks/87b0c76c23121fd8.js","/paraflux/_next/static/chunks/a4dd01b6d97ead39.js","/paraflux/_next/static/chunks/0c4d01c917817b35.js","/paraflux/_next/static/chunks/87ddec9995f9b352.js","/paraflux/_next/static/chunks/da8fbfef4e15e3c7.js"],"default"]
 6:I[97367,["/paraflux/_next/static/chunks/ff1a16fafef87110.js","/paraflux/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"FidFHCCPpPnAZV37ReNby","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/paraflux/_next/static/chunks/16297f540513d0da.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"oD2EcBupj_84_bnuRf_kG","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/paraflux/_next/static/chunks/da8fbfef4e15e3c7.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:{}
 8:null
