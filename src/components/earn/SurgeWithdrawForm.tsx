@@ -25,7 +25,7 @@ export function SurgeWithdrawForm() {
 
   const { data: userShares } = useSurgeShares();
   const { data: lastDeposit } = useSurgeLastDeposit();
-  const { redeem, isPending, isConfirming, isSuccess, reset } = useSurgeRedeem();
+  const { redeem, isPending, isConfirming, isSuccess, error: redeemError, reset } = useSurgeRedeem();
 
   const sharesNum = parseFloat(sharesInput) || 0;
   const sharesBigInt = BigInt(Math.floor(sharesNum * 1e6)) * 10n ** 12n;
@@ -135,6 +135,14 @@ export function SurgeWithdrawForm() {
           </Button>
         )}
       </div>
+
+      {redeemError && (
+        <p className="mt-2 text-center text-xs text-red-400">
+          {redeemError.message?.includes("User rejected")
+            ? "Transaction rejected"
+            : redeemError.message?.slice(0, 120) || "Transaction failed"}
+        </p>
+      )}
 
       {userShares !== undefined && (
         <p className="mt-2 text-center text-xs text-zinc-500">

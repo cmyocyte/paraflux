@@ -9,7 +9,7 @@ export function useAnchorTotalAssets() {
     address: CONTRACTS.anchorVault,
     abi: anchorVaultAbi,
     functionName: "totalAssets",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useAnchorTotalSupply() {
     address: CONTRACTS.anchorVault,
     abi: anchorVaultAbi,
     functionName: "totalSupply",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -29,7 +29,7 @@ export function useAnchorShares() {
     abi: anchorVaultAbi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }
 
@@ -60,7 +60,7 @@ export function useAnchorLastDeposit() {
     abi: anchorVaultAbi,
     functionName: "lastDepositTime",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }
 
@@ -69,7 +69,7 @@ export function useAnchorDelta() {
     address: CONTRACTS.anchorVault,
     abi: anchorVaultAbi,
     functionName: "getCurrentDelta",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -78,7 +78,7 @@ export function useAnchorRebalance() {
     address: CONTRACTS.anchorVault,
     abi: anchorVaultAbi,
     functionName: "isRebalanceNeeded",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -87,6 +87,6 @@ export function useAnchorTargetSize() {
     address: CONTRACTS.anchorVault,
     abi: anchorVaultAbi,
     functionName: "getTargetSize",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }

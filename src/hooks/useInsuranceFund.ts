@@ -9,7 +9,7 @@ export function useInsuranceBalance() {
     address: CONTRACTS.insuranceFund,
     abi: insuranceFundAbi,
     functionName: "balance",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 120000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useInsuranceTargetSize() {
     address: CONTRACTS.insuranceFund,
     abi: insuranceFundAbi,
     functionName: "targetSize",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120000 },
   });
 }
 
@@ -27,7 +27,7 @@ export function useInsuranceIsFull() {
     address: CONTRACTS.insuranceFund,
     abi: insuranceFundAbi,
     functionName: "isFull",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 120000 },
   });
 }
 
@@ -36,7 +36,7 @@ export function useInsuranceFundingRatio() {
     address: CONTRACTS.insuranceFund,
     abi: insuranceFundAbi,
     functionName: "fundingRatio",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 120000 },
   });
 }
 

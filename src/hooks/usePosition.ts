@@ -14,7 +14,7 @@ export function usePosition(isLong: boolean) {
     functionName: "getPosition",
     args: address ? [address, isLong] : undefined,
     query: {
-      refetchInterval: 15000,
+      refetchInterval: 30000,
       enabled: !!address,
     },
   });

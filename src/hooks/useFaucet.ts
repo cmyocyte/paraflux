@@ -28,11 +28,14 @@ export function useFaucet() {
     abi: mockUsdcAbi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 15000 },
+    query: { enabled: !!address, refetchInterval: 60000 },
   });
 
   useEffect(() => {
-    if (isSuccess) refetchBalance();
+    if (isSuccess) {
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+      refetchBalance();
+    }
   }, [isSuccess, refetchBalance]);
 
   useEffect(() => {
@@ -56,7 +59,6 @@ export function useFaucet() {
     if (!address) return;
     if (!canClaim()) return;
 
-    localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
     writeContract({
       address: CONTRACTS.usdc,
       abi: mockUsdcAbi,

@@ -1,22 +1,24 @@
 "use client";
 
-import { useAccumulatedFees } from "@/hooks/useProtocolStats";
-import { formatUnits } from "viem";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 
 export function FeeRevenue() {
-  const accFees = useAccumulatedFees();
+  const { protocol } = useAnalyticsData();
 
-  const totalFeesUsd =
-    accFees.data !== undefined
-      ? Number(formatUnits(accFees.data, 18))
+  const totalFeesUsd = protocol ? parseFloat(protocol.totalFees) : undefined;
+  const protocolFees = protocol
+    ? parseFloat(protocol.totalProtocolFees)
+    : undefined;
+  const insuranceFees = protocol
+    ? parseFloat(protocol.totalInsuranceFees)
+    : undefined;
+  // LP fees = total - protocol - insurance
+  const lpFees =
+    totalFeesUsd !== undefined &&
+    protocolFees !== undefined &&
+    insuranceFees !== undefined
+      ? totalFeesUsd - protocolFees - insuranceFees
       : undefined;
-
-  // Fee split: LP 75%, Protocol 20%, Insurance 5%
-  const lpFees = totalFeesUsd !== undefined ? totalFeesUsd * 0.75 : undefined;
-  const protocolFees =
-    totalFeesUsd !== undefined ? totalFeesUsd * 0.2 : undefined;
-  const insuranceFees =
-    totalFeesUsd !== undefined ? totalFeesUsd * 0.05 : undefined;
 
   return (
     <div className="rounded-lg border border-[#21262d] bg-[#0d1117] p-4">
@@ -63,14 +65,20 @@ export function FeeRevenue() {
               <div className="h-2 w-2 rounded-full bg-[#3b82f6]" />
               <span className="text-zinc-400">Protocol</span>
               <span className="text-white">
-                ${protocolFees?.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                $
+                {protocolFees?.toLocaleString("en-US", {
+                  maximumFractionDigits: 0,
+                })}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-[#f59e0b]" />
               <span className="text-zinc-400">Insurance</span>
               <span className="text-white">
-                ${insuranceFees?.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                $
+                {insuranceFees?.toLocaleString("en-US", {
+                  maximumFractionDigits: 0,
+                })}
               </span>
             </div>
           </div>

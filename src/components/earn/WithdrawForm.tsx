@@ -32,7 +32,7 @@ export function WithdrawForm() {
     shares > 0 ? sharesRaw : undefined
   );
   const { data: lastDeposit } = useLastDepositTime();
-  const { redeem, isPending, isConfirming, reset } = useRedeem();
+  const { redeem, isPending, isConfirming, error: redeemError, reset } = useRedeem();
 
   // Reset stale mutation state when wallet changes
   useEffect(() => {
@@ -130,6 +130,13 @@ export function WithdrawForm() {
           </Button>
         )}
       </div>
+      {redeemError && (
+        <p className="mt-2 text-center text-xs text-red-400">
+          {redeemError.message?.includes("User rejected")
+            ? "Transaction rejected"
+            : redeemError.message?.slice(0, 120) || "Transaction failed"}
+        </p>
+      )}
     </Card>
   );
 }

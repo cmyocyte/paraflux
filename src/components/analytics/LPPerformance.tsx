@@ -18,13 +18,13 @@ export function LPPerformance() {
 
   const [history, setHistory] = useState<SharePricePoint[]>([]);
 
-  // Share price = totalAssets (6-dec USDC) / totalSupply (18-dec shares)
+  // Share price = totalAssets (6-dec USDC) / totalSupply (6-dec shares)
   const sharePrice =
     totalAssets.data !== undefined &&
     totalSupply.data !== undefined &&
     totalSupply.data > 0n
       ? (Number(formatUnits(totalAssets.data, 6)) /
-          Number(formatUnits(totalSupply.data, 18)))
+          Number(formatUnits(totalSupply.data, 6)))
       : undefined;
 
   const utilPct =

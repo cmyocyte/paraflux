@@ -28,7 +28,7 @@ export function useUSDCApproval(spender: `0x${string}`) {
     abi: erc20Abi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 30000 },
+    query: { enabled: !!address, refetchInterval: 60000 },
   });
 
   const {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CONTRACTS } from "@/config/contracts";
 import { VaultStats } from "@/components/earn/VaultStats";
 import { YourPosition } from "@/components/earn/YourPosition";
 import { DepositForm } from "@/components/earn/DepositForm";
@@ -18,6 +19,23 @@ import { SurgeWithdrawForm } from "@/components/earn/SurgeWithdrawForm";
 import { SurgeInfo } from "@/components/earn/SurgeInfo";
 
 type VaultTab = "lp" | "anchor" | "surge";
+
+const isDeployed = (addr: string) =>
+  addr.length === 42 && addr !== "0x0000000000000000000000000000000000000000";
+const anchorLive = isDeployed(CONTRACTS.anchorVault);
+const surgeLive = isDeployed(CONTRACTS.surgeVault);
+
+function ComingSoon({ name, description }: { name: string; description: string }) {
+  return (
+    <div className="mt-6 flex flex-col items-center justify-center rounded-lg border border-[#21262d] bg-[#0d1117] px-6 py-16 text-center">
+      <p className="text-lg font-semibold text-zinc-300">{name}</p>
+      <p className="mt-2 max-w-md text-sm text-zinc-500">{description}</p>
+      <span className="mt-4 rounded-full border border-[#22c55e]/30 bg-[#22c55e]/10 px-4 py-1 text-xs font-medium text-[#22c55e]">
+        Coming Soon
+      </span>
+    </div>
+  );
+}
 
 export default function EarnPage() {
   const [activeTab, setActiveTab] = useState<VaultTab>("lp");
@@ -51,6 +69,7 @@ export default function EarnPage() {
           onClick={() => setActiveTab("anchor")}
         >
           <span className="font-semibold">Anchor Strategy</span>
+          {!anchorLive && <span className="ml-1.5 rounded bg-zinc-700 px-1.5 py-0.5 text-[10px] font-medium text-zinc-300">SOON</span>}
           <span className="ml-2 text-xs text-zinc-500">Delta-neutral yield</span>
         </button>
         <button
@@ -62,6 +81,7 @@ export default function EarnPage() {
           onClick={() => setActiveTab("surge")}
         >
           <span className="font-semibold">Surge</span>
+          {!surgeLive && <span className="ml-1.5 rounded bg-zinc-700 px-1.5 py-0.5 text-[10px] font-medium text-zinc-300">SOON</span>}
           <span className="ml-2 text-xs text-zinc-500">Long + funding yield</span>
         </button>
       </div>
@@ -88,37 +108,51 @@ export default function EarnPage() {
 
       {/* Anchor Strategy tab */}
       {activeTab === "anchor" && (
-        <>
-          <div className="mt-6">
-            <AnchorStats />
-          </div>
-          <div className="mt-6">
-            <AnchorPosition />
-          </div>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <AnchorDepositForm />
-            <AnchorWithdrawForm />
-          </div>
-          <div className="mt-6">
-            <AnchorInfo />
-          </div>
-        </>
+        anchorLive ? (
+          <>
+            <div className="mt-6">
+              <AnchorStats />
+            </div>
+            <div className="mt-6">
+              <AnchorPosition />
+            </div>
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              <AnchorDepositForm />
+              <AnchorWithdrawForm />
+            </div>
+            <div className="mt-6">
+              <AnchorInfo />
+            </div>
+          </>
+        ) : (
+          <ComingSoon
+            name="Anchor Strategy"
+            description="Delta-neutral yield from shorting the power perpetual. Earns funding payments while maintaining market-neutral exposure."
+          />
+        )
       )}
 
       {/* Surge tab */}
       {activeTab === "surge" && (
-        <>
-          <div className="mt-6">
-            <SurgeStats />
-          </div>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <SurgeDepositForm />
-            <SurgeWithdrawForm />
-          </div>
-          <div className="mt-6">
-            <SurgeInfo />
-          </div>
-        </>
+        surgeLive ? (
+          <>
+            <div className="mt-6">
+              <SurgeStats />
+            </div>
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              <SurgeDepositForm />
+              <SurgeWithdrawForm />
+            </div>
+            <div className="mt-6">
+              <SurgeInfo />
+            </div>
+          </>
+        ) : (
+          <ComingSoon
+            name="Surge Strategy"
+            description="Combines Anchor's funding yield with a leveraged long HYPE position. Higher risk, higher potential returns."
+          />
+        )
       )}
     </div>
   );

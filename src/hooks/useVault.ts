@@ -9,7 +9,7 @@ export function useTotalAssets() {
     address: CONTRACTS.lpVault,
     abi: lpVaultAbi,
     functionName: "totalAssets",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useTotalSupply() {
     address: CONTRACTS.lpVault,
     abi: lpVaultAbi,
     functionName: "totalSupply",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -29,7 +29,7 @@ export function useUserShares() {
     abi: lpVaultAbi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }
 
@@ -58,7 +58,7 @@ export function useUtilization() {
     address: CONTRACTS.lpVault,
     abi: lpVaultAbi,
     functionName: "utilization",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -69,6 +69,6 @@ export function useLastDepositTime() {
     abi: lpVaultAbi,
     functionName: "lastDepositTime",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }

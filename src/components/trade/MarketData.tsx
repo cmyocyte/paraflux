@@ -3,6 +3,7 @@
 import { useCurrentIndex, useHypeSpot } from "@/hooks/useOracle";
 import { useCurrentFundingRate, useBaseVolatility } from "@/hooks/useFunding";
 import { useOpenInterest } from "@/hooks/useOpenInterest";
+import { useVolume } from "@/hooks/useVolume";
 import { wadToNumber, formatUsd, formatCompact, formatFundingRate, SECONDS_PER_YEAR } from "@/lib/format";
 import { FundingCountdown } from "./FundingCountdown";
 import { FundingSparkline } from "./FundingSparkline";
@@ -35,6 +36,7 @@ export function MarketData() {
   const { longOI, shortOI } = useOpenInterest();
   const { data: fundingRate } = useCurrentFundingRate(longOI, shortOI);
   const { data: baseVol } = useBaseVolatility();
+  const { volume24h } = useVolume();
 
   const isLive = spot !== undefined || index !== undefined;
 
@@ -76,6 +78,10 @@ export function MarketData() {
         label={volIsImplied ? "Implied Vol" : "Base Vol"}
         value={volDisplay !== null ? `${volDisplay.toFixed(1)}%` : "--"}
         sub="ann."
+      />
+      <Stat
+        label="24h Vol"
+        value={volume24h > 0 ? formatCompact(volume24h) : "--"}
       />
       <Stat
         label="OI"

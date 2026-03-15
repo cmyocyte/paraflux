@@ -2,11 +2,8 @@
 
 import { useTotalAssets } from "@/hooks/useVault";
 import { useOpenInterest } from "@/hooks/useOpenInterest";
-import {
-  useAccumulatedFees,
-  useTotalPositions,
-} from "@/hooks/useProtocolStats";
 import { useInsuranceFund } from "@/hooks/useInsuranceFund";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 import { formatUnits } from "viem";
 
 function formatUsd(value: bigint | undefined, decimals = 6): string {
@@ -47,20 +44,32 @@ function StatCard({
   );
 }
 
+function formatCompactUsd(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n);
+}
+
 export function ProtocolOverview() {
   const totalAssets = useTotalAssets();
   const { longOI, shortOI } = useOpenInterest();
-  const accFees = useAccumulatedFees();
-  const totalPos = useTotalPositions();
   const insurance = useInsuranceFund();
+  const { protocol } = useAnalyticsData();
 
   const totalOI =
     longOI !== undefined && shortOI !== undefined
       ? longOI + shortOI
       : undefined;
 
+  const lifetimeVolume = protocol ? parseFloat(protocol.totalVolume) : 0;
+  const totalFees = protocol ? parseFloat(protocol.totalFees) : 0;
+  const activePositions = protocol ? protocol.activePositions : "---";
+
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       <StatCard label="Total Value Locked" value={formatUsd(totalAssets.data)} />
       <StatCard
         label="Open Interest"
@@ -71,10 +80,17 @@ export function ProtocolOverview() {
             : undefined
         }
       />
-      <StatCard label="Accumulated Fees" value={formatWad(accFees.data)} />
+      <StatCard
+        label="Lifetime Volume"
+        value={lifetimeVolume > 0 ? formatCompactUsd(lifetimeVolume) : "---"}
+      />
+      <StatCard
+        label="Accumulated Fees"
+        value={totalFees > 0 ? formatCompactUsd(totalFees) : "---"}
+      />
       <StatCard
         label="Active Positions"
-        value={totalPos.data?.toString() ?? "---"}
+        value={activePositions}
       />
       <StatCard
         label="Insurance Fund"

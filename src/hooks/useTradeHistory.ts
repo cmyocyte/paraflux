@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { decodeEventLog, parseAbiItem } from "viem";
+import { decodeEventLog } from "viem";
 import { routerAbi } from "@/lib/abi/PowerPerpRouter";
 import { liquidationEngineAbi } from "@/lib/abi/LiquidationEngine";
 import { CONTRACTS } from "@/config/contracts";
+import { subgraphClient } from "@/config/subgraph";
+import { gql } from "graphql-request";
 
 export type TradeEvent = {
   type:
@@ -26,50 +28,30 @@ export type TradeEvent = {
 };
 
 const STORAGE_KEY = "paraflux_trade_history";
-const LAST_SCANNED_KEY = "paraflux_liq_last_block";
-
-/** Max blocks per getLogs RPC call (HyperEVM limit) */
-const RPC_MAX_RANGE = 1000n;
-
-/** How many blocks to look back on first scan (~3 hours at 1 block/sec) */
-const INITIAL_LOOKBACK = 10_000n;
-
-/** Delay between paginated RPC calls to avoid rate limiting (ms) */
-const CHUNK_DELAY = 2_000;
 
 /** Minimum interval between liquidation polls (ms) */
 const POLL_INTERVAL = 60_000;
 
-/** Delay before first poll to avoid competing with wagmi's initial RPC calls (ms) */
-const INITIAL_DELAY = 10_000;
-
-/** Retry delay when rate limited (ms) */
-const RETRY_DELAY = 5_000;
-
-/** Max retries for rate-limited RPC calls */
-const MAX_RETRIES = 3;
-
-function getLastScannedBlock(address: string): bigint {
-  try {
-    const raw = localStorage.getItem(
-      `${LAST_SCANNED_KEY}_${address.toLowerCase()}`
-    );
-    return raw ? BigInt(raw) : 0n;
-  } catch {
-    return 0n;
+/** Subgraph query for user's liquidation events */
+const USER_LIQUIDATIONS_QUERY = gql`
+  query UserLiquidations($trader: String!) {
+    liquidations(
+      where: { trader: $trader }
+      orderBy: timestamp
+      orderDirection: desc
+      first: 50
+    ) {
+      trader
+      isLong
+      size
+      collateral
+      reward
+      badDebt
+      timestamp
+      txHash
+    }
   }
-}
-
-function setLastScannedBlock(address: string, block: bigint) {
-  try {
-    localStorage.setItem(
-      `${LAST_SCANNED_KEY}_${address.toLowerCase()}`,
-      block.toString()
-    );
-  } catch {
-    // localStorage full or unavailable
-  }
-}
+`;
 
 function loadTrades(address: string): TradeEvent[] {
   try {
@@ -107,9 +89,9 @@ export function useTradeHistory() {
     setTrades(loadTrades(address));
   }, [address]);
 
-  // Poll for PositionLiquidated events targeting the connected user
+  // Poll for user's liquidation events via subgraph (zero RPC calls)
   useEffect(() => {
-    if (!address || !client || CONTRACTS.liquidationEngine === "0x") return;
+    if (!address) return;
 
     let cancelled = false;
 
@@ -118,124 +100,35 @@ export function useTradeHistory() {
       pollingRef.current = true;
 
       try {
-        // Retry getBlockNumber with backoff — wagmi's page-load burst often exhausts the rate limit
-        let currentBlock: bigint | null = null;
-        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-          try {
-            currentBlock = await client!.getBlockNumber();
-            break;
-          } catch {
-            if (attempt < MAX_RETRIES - 1) {
-              await new Promise((r) => setTimeout(r, RETRY_DELAY * (attempt + 1)));
-            }
-          }
-        }
-        if (currentBlock === null) {
-          pollingRef.current = false;
-          return; // All retries failed, will try again on next poll interval
-        }
-
-        const lastScanned = getLastScannedBlock(address!);
-
-        // On first scan, look back INITIAL_LOOKBACK blocks; after that, only scan new blocks
-        const fromBlock =
-          lastScanned > 0n
-            ? lastScanned + 1n
-            : currentBlock > INITIAL_LOOKBACK
-              ? currentBlock - INITIAL_LOOKBACK
-              : 0n;
-
-        if (fromBlock > currentBlock) {
-          pollingRef.current = false;
-          return;
-        }
-
-        // Paginate getLogs in chunks of RPC_MAX_RANGE with delay to avoid rate limits
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const allLogs: any[] = [];
-        let isFirstChunk = true;
-        let completedAll = true;
-        let lastSuccessfulBlock = fromBlock;
-        for (let from = fromBlock; from <= currentBlock && !cancelled; from += RPC_MAX_RANGE) {
-          if (!isFirstChunk) {
-            await new Promise((r) => setTimeout(r, CHUNK_DELAY));
-          }
-          isFirstChunk = false;
-
-          const to = from + RPC_MAX_RANGE - 1n > currentBlock
-            ? currentBlock
-            : from + RPC_MAX_RANGE - 1n;
-
-          try {
-            const chunk = await client!.getLogs({
-              address: CONTRACTS.liquidationEngine,
-              event: parseAbiItem(
-                "event PositionLiquidated(address indexed trader, address indexed liquidator, bool indexed isLong, uint256 size, uint256 indexAtLiquidation, uint256 liquidatorReward, uint256 badDebt)"
-              ),
-              args: { trader: address },
-              fromBlock: from,
-              toBlock: to,
-            });
-            allLogs.push(...chunk);
-            lastSuccessfulBlock = to;
-          } catch {
-            // Rate limited — save progress so next poll resumes from here
-            completedAll = false;
-            break;
-          }
-        }
-
-        const isFirstScan = lastScanned === 0n;
-
-        // Save cursor: always save on follow-up scans, but on first scan
-        // only save if we found events (otherwise rescan on next poll)
-        if (completedAll && (!isFirstScan || allLogs.length > 0)) {
-          setLastScannedBlock(address!, currentBlock);
-        } else if (!completedAll && lastSuccessfulBlock > fromBlock && (!isFirstScan || allLogs.length > 0)) {
-          setLastScannedBlock(address!, lastSuccessfulBlock);
-        }
-
-        console.log(`[liquidation-poll] scanned blocks ${fromBlock}→${lastSuccessfulBlock} (first=${isFirstScan}, found=${allLogs.length}, complete=${completedAll})`);
-
-        if (cancelled || allLogs.length === 0) {
-          pollingRef.current = false;
-          return;
-        }
-
-        const logs = allLogs;
-        const liquidationEvents: TradeEvent[] = [];
-
-        for (const log of logs) {
-          const args = log.args as {
-            trader: `0x${string}`;
-            liquidator: `0x${string}`;
+        const result = await subgraphClient.request<{
+          liquidations: Array<{
             isLong: boolean;
-            size: bigint;
-            indexAtLiquidation: bigint;
-            liquidatorReward: bigint;
-            badDebt: bigint;
-          };
+            size: string;
+            badDebt: string;
+            timestamp: string;
+            txHash: string;
+          }>;
+        }>(USER_LIQUIDATIONS_QUERY, {
+          trader: address!.toLowerCase(),
+        });
 
-          // Estimate timestamp from block number (~1 block/sec on HyperEVM)
-          // Avoids extra RPC calls that trigger rate limits
-          const bn = log.blockNumber;
-          const timestamp = bn
-            ? Date.now() - Number(currentBlock - bn) * 1000
-            : Date.now();
-
-          liquidationEvents.push({
-            type: args.isLong ? "liquidated-long" : "liquidated-short",
-            size: args.size.toString(),
-            entryIndex: args.indexAtLiquidation.toString(),
-            badDebt: args.badDebt.toString(),
-            txHash: log.transactionHash,
-            timestamp,
-          });
+        if (cancelled || !result.liquidations.length) {
+          pollingRef.current = false;
+          return;
         }
 
-        if (!cancelled && liquidationEvents.length > 0) {
+        const liquidationEvents: TradeEvent[] = result.liquidations.map(
+          (liq) => ({
+            type: (liq.isLong ? "liquidated-long" : "liquidated-short") as TradeEvent["type"],
+            size: liq.size,
+            badDebt: liq.badDebt,
+            txHash: liq.txHash,
+            timestamp: Number(liq.timestamp) * 1000,
+          })
+        );
+
+        if (!cancelled) {
           setTrades((prev) => {
-            // Deduplicate by txHash
             const existingHashes = new Set(prev.map((t) => t.txHash));
             const newOnes = liquidationEvents.filter(
               (e) => !existingHashes.has(e.txHash)
@@ -250,22 +143,20 @@ export function useTradeHistory() {
           });
         }
       } catch (err) {
-        console.error("Failed to poll liquidation events:", err);
+        console.error("[trade-history] subgraph liquidation fetch error:", err);
       } finally {
         pollingRef.current = false;
       }
     }
 
-    // Delay first poll to avoid competing with wagmi's initial RPC burst
-    const initialTimeout = setTimeout(pollLiquidations, INITIAL_DELAY);
+    pollLiquidations();
     const interval = setInterval(pollLiquidations, POLL_INTERVAL);
 
     return () => {
       cancelled = true;
-      clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [address, client]);
+  }, [address]);
 
   // Record a trade from a confirmed transaction hash
   const recordTrade = useCallback(

@@ -25,13 +25,16 @@ export function DepositForm() {
   const { data: previewShares } = usePreviewShares(
     amount > 0 ? usdcAmount : undefined
   );
-  const { deposit, isPending, isConfirming, isSuccess, reset } = useDeposit();
+  const { deposit, isPending, isConfirming, isSuccess, error: depositError, reset } = useDeposit();
   const {
     approve,
     needsApproval,
     isApproving,
+    approveError,
     balance,
   } = useUSDCApproval(CONTRACTS.lpVault);
+
+  const txError = depositError || approveError;
 
   const requiresApproval = needsApproval(usdcAmount);
 
@@ -116,6 +119,14 @@ export function DepositForm() {
           </Button>
         )}
       </div>
+
+      {txError && (
+        <p className="mt-2 text-center text-xs text-red-400">
+          {txError.message?.includes("User rejected")
+            ? "Transaction rejected"
+            : txError.message?.slice(0, 120) || "Transaction failed"}
+        </p>
+      )}
 
       {balance !== undefined && (
         <p className="mt-2 text-center text-xs text-zinc-500">

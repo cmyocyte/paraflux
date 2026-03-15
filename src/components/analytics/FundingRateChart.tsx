@@ -4,8 +4,9 @@ import { useReadContract } from "wagmi";
 import { CONTRACTS } from "@/config/contracts";
 import { fundingEngineAbi } from "@/lib/abi/FundingEngine";
 import { positionEngineAbi } from "@/lib/abi/PositionEngine";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 import { formatUnits } from "viem";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SECONDS_PER_YEAR = 31_557_600;
 
@@ -15,18 +16,20 @@ interface FundingPoint {
 }
 
 export function FundingRateChart() {
+  const { fundingSnapshots } = useAnalyticsData();
+
   const longOI = useReadContract({
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "longOpenInterest",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 
   const shortOI = useReadContract({
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "shortOpenInterest",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 
   const fundingRate = useReadContract({
@@ -38,18 +41,39 @@ export function FundingRateChart() {
         ? [longOI.data, shortOI.data]
         : undefined,
     query: {
-      refetchInterval: 15000,
+      refetchInterval: 60000,
       enabled: longOI.data !== undefined && shortOI.data !== undefined,
     },
   });
 
   const [history, setHistory] = useState<FundingPoint[]>([]);
+  const seededRef = useRef(false);
+
+  // Seed history from subgraph snapshots on first load
+  useEffect(() => {
+    if (seededRef.current || fundingSnapshots.length === 0) return;
+    seededRef.current = true;
+
+    // Snapshots arrive newest-first; reverse for chronological order
+    const seed: FundingPoint[] = [...fundingSnapshots]
+      .reverse()
+      .map((snap) => {
+        const ratePerSecond = Number(formatUnits(BigInt(snap.fundingRate), 18));
+        return {
+          time: Number(snap.timestamp) * 1000,
+          annualRate: ratePerSecond * SECONDS_PER_YEAR * 100,
+        };
+      });
+
+    setHistory(seed);
+  }, [fundingSnapshots]);
 
   const annualRate =
     fundingRate.data !== undefined
       ? Number(formatUnits(fundingRate.data, 18)) * SECONDS_PER_YEAR * 100
       : undefined;
 
+  // Append live polling data points
   useEffect(() => {
     if (annualRate === undefined) return;
     setHistory((prev) => [

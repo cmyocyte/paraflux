@@ -9,7 +9,7 @@ export function useSurgeTotalAssets() {
     address: CONTRACTS.surgeVault,
     abi: surgeVaultAbi,
     functionName: "totalAssets",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useSurgeTotalSupply() {
     address: CONTRACTS.surgeVault,
     abi: surgeVaultAbi,
     functionName: "totalSupply",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -29,7 +29,7 @@ export function useSurgeShares() {
     abi: surgeVaultAbi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }
 
@@ -60,7 +60,7 @@ export function useSurgeLastDeposit() {
     abi: surgeVaultAbi,
     functionName: "lastDepositTime",
     args: address ? [address] : undefined,
-    query: { refetchInterval: 30000, enabled: !!address },
+    query: { refetchInterval: 60000, enabled: !!address },
   });
 }
 
@@ -69,7 +69,7 @@ export function useSurgeAnchorAllocation() {
     address: CONTRACTS.surgeVault,
     abi: surgeVaultAbi,
     functionName: "getAnchorAllocation",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -78,7 +78,7 @@ export function useSurgeLongAllocation() {
     address: CONTRACTS.surgeVault,
     abi: surgeVaultAbi,
     functionName: "getLongAllocation",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 }
 
@@ -87,6 +87,6 @@ export function useSurgeRebalance() {
     address: CONTRACTS.surgeVault,
     abi: surgeVaultAbi,
     functionName: "isRebalanceNeeded",
-    query: { refetchInterval: 15000 },
+    query: { refetchInterval: 60000 },
   });
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import { useInsuranceFund } from "@/hooks/useInsuranceFund";
-import { useTotalBadDebt, useTotalCollateralLocked } from "@/hooks/useProtocolStats";
+import { useTotalCollateralLocked } from "@/hooks/useProtocolStats";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 import { useTotalAssets } from "@/hooks/useVault";
 import { formatUnits } from "viem";
 
 export function PoolHealth() {
   const insurance = useInsuranceFund();
-  const totalBadDebt = useTotalBadDebt();
+  const { protocol } = useAnalyticsData();
   const totalCollateral = useTotalCollateralLocked();
   const totalAssets = useTotalAssets();
 
@@ -27,13 +28,12 @@ export function PoolHealth() {
       ? (insuranceBalance / insuranceTarget) * 100
       : undefined;
 
-  // Bad debt
-  const badDebtUsd =
-    totalBadDebt.data !== undefined
-      ? Number(formatUnits(totalBadDebt.data, 18))
-      : undefined;
+  // Bad debt from subgraph
+  const badDebtUsd = protocol?.totalBadDebt
+    ? parseFloat(protocol.totalBadDebt)
+    : undefined;
 
-  // Collateral locked
+  // Collateral locked (still RPC — not indexed in subgraph)
   const collateralUsd =
     totalCollateral.data !== undefined
       ? Number(formatUnits(totalCollateral.data, 18))

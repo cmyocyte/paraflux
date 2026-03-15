@@ -8,19 +8,26 @@ import { useState, useEffect } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { EXPECTED_CHAIN_ID } from "@/config/contracts";
+
 const NAV_LINKS = [
   { href: "/trade", label: "Trade" },
   { href: "/earn", label: "Earn" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/analytics", label: "Analytics" },
+  ...(EXPECTED_CHAIN_ID === 998
+    ? [{ href: "/faucet", label: "Faucet" }]
+    : []),
 ];
 
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const isHome = pathname === "/";
+  const isHome = pathname === "/" || pathname === "";
+  const isActive = (href: string) =>
+    pathname === href || pathname === `${href}/`;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 300);
@@ -46,7 +53,7 @@ export function Header() {
               href={link.href}
               className={clsx(
                 "rounded px-3 py-1.5 text-[13px] font-medium transition-all",
-                pathname === link.href
+                isActive(link.href)
                   ? "bg-[#22c55e]/10 text-[#22c55e]"
                   : "text-zinc-400 hover:text-zinc-200"
               )}
@@ -104,7 +111,7 @@ export function Header() {
               onClick={() => setMobileOpen(false)}
               className={clsx(
                 "block rounded px-3 py-2 text-[13px] font-medium",
-                pathname === link.href
+                isActive(link.href)
                   ? "bg-[#22c55e]/10 text-[#22c55e]"
                   : "text-zinc-400 hover:text-zinc-200"
               )}

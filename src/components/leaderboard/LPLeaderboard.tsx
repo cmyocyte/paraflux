@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/Button";
 const PAGE_SIZE = 10;
 
 function formatRelativeTime(timestamp: number): string {
+  if (timestamp === 0) return "---";
   const seconds = Math.floor(Date.now() / 1000) - timestamp;
+  if (seconds < 0) return "just now";
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   const days = Math.floor(seconds / 86400);
@@ -19,7 +21,7 @@ export function LPLeaderboard() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data } = useLPLeaderboard();
+  const { data, isLoading } = useLPLeaderboard();
 
   useEffect(() => {
     setPage(1);
@@ -70,7 +72,19 @@ export function LPLeaderboard() {
             </tr>
           </thead>
           <tbody>
-            {pageData.length > 0 ? (
+            {isLoading ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-3 py-8 text-center text-xs text-zinc-500"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-zinc-600 border-t-[#22c55e]" />
+                    Scanning on-chain deposits...
+                  </div>
+                </td>
+              </tr>
+            ) : pageData.length > 0 ? (
               pageData.map((lp, i) => {
                 const rank = (page - 1) * PAGE_SIZE + i + 1;
                 return (
@@ -85,7 +99,9 @@ export function LPLeaderboard() {
                       {shortenAddress(lp.address)}
                     </td>
                     <td className="px-3 py-2.5 text-right font-mono text-[#e1e4e8]">
-                      {lp.shares.toLocaleString()}
+                      {lp.shares.toLocaleString(undefined, {
+                        maximumFractionDigits: 0,
+                      })}
                     </td>
                     <td className="px-3 py-2.5 text-right font-mono text-[#e1e4e8]">
                       {formatUsd(lp.valueUsdc)}
@@ -114,31 +130,33 @@ export function LPLeaderboard() {
       </div>
 
       {/* Pagination */}
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-zinc-500">
-          {filtered.length > 0
-            ? `${(page - 1) * PAGE_SIZE + 1}-${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`
-            : "0 results"}
-        </span>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Prev
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
+      {!isLoading && (
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs text-zinc-500">
+            {filtered.length > 0
+              ? `${(page - 1) * PAGE_SIZE + 1}-${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`
+              : "0 results"}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

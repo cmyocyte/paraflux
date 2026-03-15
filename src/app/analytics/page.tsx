@@ -7,6 +7,7 @@ import { FeeRevenue } from "@/components/analytics/FeeRevenue";
 import { LiquidationFeed } from "@/components/analytics/LiquidationFeed";
 import { LPPerformance } from "@/components/analytics/LPPerformance";
 import { PoolHealth } from "@/components/analytics/PoolHealth";
+import { VolatilityPanel } from "@/components/analytics/VolatilityPanel";
 
 export default function AnalyticsPage() {
   return (
@@ -33,6 +34,9 @@ export default function AnalyticsPage() {
         <LPPerformance />
         <PoolHealth />
       </div>
+
+      {/* Row 4: Volatility Oracle */}
+      <VolatilityPanel />
     </div>
   );
 }

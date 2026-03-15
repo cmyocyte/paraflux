@@ -24,13 +24,16 @@ export function SurgeDepositForm() {
   const { data: previewShares } = useSurgePreviewShares(
     amount > 0 ? usdcAmount : undefined
   );
-  const { deposit, isPending, isConfirming, isSuccess, reset } = useSurgeDeposit();
+  const { deposit, isPending, isConfirming, isSuccess, error: depositError, reset } = useSurgeDeposit();
   const {
     approve,
     needsApproval,
     isApproving,
+    approveError,
     balance,
   } = useUSDCApproval(CONTRACTS.surgeVault);
+
+  const txError = depositError || approveError;
 
   const requiresApproval = needsApproval(usdcAmount);
 
@@ -118,6 +121,14 @@ export function SurgeDepositForm() {
           </Button>
         )}
       </div>
+
+      {txError && (
+        <p className="mt-2 text-center text-xs text-red-400">
+          {txError.message?.includes("User rejected")
+            ? "Transaction rejected"
+            : txError.message?.slice(0, 120) || "Transaction failed"}
+        </p>
+      )}
 
       {balance !== undefined && (
         <p className="mt-2 text-center text-xs text-zinc-500">
