@@ -17,7 +17,7 @@ export function useCurrentFundingRate(longOI?: bigint, shortOI?: bigint) {
       ? [longOI, shortOI]
       : undefined,
     query: {
-      refetchInterval: 60000,
+      refetchInterval: 120_000,
       enabled: longOI !== undefined && shortOI !== undefined,
     },
   });
@@ -28,7 +28,7 @@ export function useCumulativeFunding() {
     address: CONTRACTS.fundingEngine,
     abi: fundingEngineAbi,
     functionName: "cumulativeFunding",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }
 
@@ -37,7 +37,7 @@ export function useBaseVolatility() {
     address: CONTRACTS.fundingEngine,
     abi: fundingEngineAbi,
     functionName: "baseVolatility",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }
 
@@ -46,7 +46,7 @@ export function useLastFundingUpdate() {
     address: CONTRACTS.fundingEngine,
     abi: fundingEngineAbi,
     functionName: "lastFundingUpdate",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }
 

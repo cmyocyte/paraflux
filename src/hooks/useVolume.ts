@@ -7,7 +7,7 @@ import {
   type SubgraphProtocol,
 } from "@/lib/subgraph-queries";
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 60_000;
 
 /**
  * Fetches protocol volume from the subgraph.

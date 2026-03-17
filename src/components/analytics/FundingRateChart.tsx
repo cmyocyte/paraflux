@@ -22,14 +22,14 @@ export function FundingRateChart() {
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "longOpenInterest",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 
   const shortOI = useReadContract({
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "shortOpenInterest",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 
   const fundingRate = useReadContract({
@@ -41,7 +41,7 @@ export function FundingRateChart() {
         ? [longOI.data, shortOI.data]
         : undefined,
     query: {
-      refetchInterval: 60000,
+      refetchInterval: 120_000,
       enabled: longOI.data !== undefined && shortOI.data !== undefined,
     },
   });

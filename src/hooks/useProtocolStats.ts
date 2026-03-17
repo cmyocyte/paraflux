@@ -9,6 +9,6 @@ export function useTotalCollateralLocked() {
     address: CONTRACTS.lpVault,
     abi: lpVaultAbi,
     functionName: "totalCollateralLocked",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }

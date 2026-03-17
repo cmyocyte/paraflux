@@ -9,7 +9,7 @@ export function useCurrentIndex() {
     address: CONTRACTS.oracle,
     abi: oracleAbi,
     functionName: "getIndex",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60_000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useHypeSpot() {
     address: CONTRACTS.oracle,
     abi: oracleAbi,
     functionName: "getHypeSpot",
-    query: { refetchInterval: 30000 },
+    query: { refetchInterval: 60_000 },
   });
 }
 
@@ -27,6 +27,6 @@ export function useEmaIndex() {
     address: CONTRACTS.oracle,
     abi: oracleAbi,
     functionName: "getEmaIndex",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }

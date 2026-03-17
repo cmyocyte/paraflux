@@ -9,7 +9,7 @@ export function useTotalLongOI() {
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "longOpenInterest",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }
 
@@ -18,7 +18,7 @@ export function useTotalShortOI() {
     address: CONTRACTS.positionEngine,
     abi: positionEngineAbi,
     functionName: "shortOpenInterest",
-    query: { refetchInterval: 60000 },
+    query: { refetchInterval: 120_000 },
   });
 }
 
