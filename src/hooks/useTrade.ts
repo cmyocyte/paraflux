@@ -7,6 +7,8 @@ import {
 import { CONTRACTS } from "@/config/contracts";
 import { routerAbi } from "@/lib/abi/PowerPerpRouter";
 
+const NO_INTEGRATOR = "0x0000000000000000000000000000000000000000" as const;
+
 export function useOpenLong() {
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } =
@@ -22,7 +24,7 @@ export function useOpenLong() {
       address: CONTRACTS.router,
       abi: routerAbi,
       functionName: "openLong",
-      args: [size, usdcAmount, slippageLimit, deadline],
+      args: [size, usdcAmount, slippageLimit, deadline, NO_INTEGRATOR],
     });
   };
 
@@ -44,7 +46,7 @@ export function useOpenShort() {
       address: CONTRACTS.router,
       abi: routerAbi,
       functionName: "openShort",
-      args: [size, usdcAmount, slippageLimit, deadline],
+      args: [size, usdcAmount, slippageLimit, deadline, NO_INTEGRATOR],
     });
   };
 
