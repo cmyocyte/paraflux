@@ -36,13 +36,18 @@ export function FundingCountdown() {
   const seconds = isLive ? elapsed : demoElapsed;
 
   return (
-    <span className="font-mono text-xs text-zinc-500">
-      {formatCountdown(seconds)} ago
-      {!isLive && (
-        <span className="ml-1 text-[10px] font-bold uppercase tracking-wider text-zinc-700">
-          demo
-        </span>
-      )}
-    </span>
+    <div className="flex items-baseline gap-2">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+        Last Accrual
+      </span>
+      <span className="font-mono text-xs text-zinc-500">
+        {formatCountdown(seconds)} ago
+        {!isLive && (
+          <span className="ml-1 text-[10px] font-bold uppercase tracking-wider text-zinc-700">
+            demo
+          </span>
+        )}
+      </span>
+    </div>
   );
 }

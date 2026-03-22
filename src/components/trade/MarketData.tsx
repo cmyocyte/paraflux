@@ -6,7 +6,6 @@ import { useOpenInterest } from "@/hooks/useOpenInterest";
 import { useVolume } from "@/hooks/useVolume";
 import { wadToNumber, formatUsd, formatCompact, formatFundingRate, SECONDS_PER_YEAR } from "@/lib/format";
 import { FundingCountdown } from "./FundingCountdown";
-import { FundingSparkline } from "./FundingSparkline";
 
 const DEMO = {
   spot: "$24.53",
@@ -91,7 +90,6 @@ export function MarketData() {
             : DEMO.oi
         }
       />
-      <FundingSparkline />
       {!isLive && (
         <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-zinc-700">
           Demo
