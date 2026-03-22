@@ -8,6 +8,7 @@ import { useUSDCApproval } from "@/hooks/useUSDCApproval";
 import { useSurgePreviewShares } from "@/hooks/useSurge";
 import { CONTRACTS, EXPECTED_CHAIN_ID } from "@/config/contracts";
 import { numberToUsdc, usdcToNumber, formatUsd } from "@/lib/format";
+import { getTxUrl } from "@/lib/explorer";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -24,7 +25,7 @@ export function SurgeDepositForm() {
   const { data: previewShares } = useSurgePreviewShares(
     amount > 0 ? usdcAmount : undefined
   );
-  const { deposit, isPending, isConfirming, isSuccess, error: depositError, reset } = useSurgeDeposit();
+  const { deposit, isPending, isConfirming, isSuccess, error: depositError, hash, reset } = useSurgeDeposit();
   const {
     approve,
     needsApproval,
@@ -59,6 +60,16 @@ export function SurgeDepositForm() {
             Your Surge shares have been minted. You can withdraw after the 1-hour
             cooldown.
           </p>
+          {hash && (
+            <a
+              href={getTxUrl(hash, chainId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              View transaction
+            </a>
+          )}
           <Button
             className="mt-4"
             variant="secondary"

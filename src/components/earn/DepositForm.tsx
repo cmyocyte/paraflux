@@ -8,6 +8,7 @@ import { useUSDCApproval } from "@/hooks/useUSDCApproval";
 import { usePreviewShares } from "@/hooks/useVault";
 import { CONTRACTS } from "@/config/contracts";
 import { numberToUsdc, usdcToNumber, formatUsd } from "@/lib/format";
+import { getTxUrl } from "@/lib/explorer";
 import { EXPECTED_CHAIN_ID } from "@/config/contracts";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +26,7 @@ export function DepositForm() {
   const { data: previewShares } = usePreviewShares(
     amount > 0 ? usdcAmount : undefined
   );
-  const { deposit, isPending, isConfirming, isSuccess, error: depositError, reset } = useDeposit();
+  const { deposit, isPending, isConfirming, isSuccess, error: depositError, hash, reset } = useDeposit();
   const {
     approve,
     needsApproval,
@@ -61,6 +62,16 @@ export function DepositForm() {
             Your LP shares have been minted. You can withdraw after the 1-hour
             cooldown.
           </p>
+          {hash && (
+            <a
+              href={getTxUrl(hash, chainId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              View transaction
+            </a>
+          )}
           <Button
             className="mt-4"
             variant="secondary"

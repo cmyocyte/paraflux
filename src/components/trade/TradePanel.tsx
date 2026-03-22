@@ -18,6 +18,7 @@ import { OrderSummary } from "./OrderSummary";
 import { PayoffCurve } from "./PayoffCurve";
 import { useTradeHistoryContext } from "@/context/TradeHistoryContext";
 import { WrongNetworkBanner } from "@/components/ui/WrongNetworkBanner";
+import { getTxUrl } from "@/lib/explorer";
 import { EXPECTED_CHAIN_ID } from "@/config/contracts";
 import { clsx } from "clsx";
 
@@ -438,7 +439,7 @@ export function TradePanel() {
           </div>
           {txStatus.type === "success" && tradeHash && (
             <a
-              href={`${chainId === 999 ? "https://hyperscan.xyz" : "https://testnet.purrsec.com"}/tx/${tradeHash}`}
+              href={getTxUrl(tradeHash, chainId)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-0.5 block text-[10px] text-zinc-500 hover:text-zinc-400"

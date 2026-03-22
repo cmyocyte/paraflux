@@ -4,7 +4,7 @@ import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 import { formatUnits } from "viem";
 
 export function LiquidationFeed() {
-  const { liquidations, isLoading } = useAnalyticsData();
+  const { liquidations, isLoading, isError } = useAnalyticsData();
 
   const shortenAddr = (addr: string) =>
     `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -18,6 +18,10 @@ export function LiquidationFeed() {
       {isLoading ? (
         <div className="flex h-32 items-center justify-center text-zinc-600">
           Loading...
+        </div>
+      ) : isError ? (
+        <div className="flex h-32 items-center justify-center text-red-400">
+          Failed to load liquidation data
         </div>
       ) : liquidations.length === 0 ? (
         <div className="flex h-32 items-center justify-center text-zinc-600">

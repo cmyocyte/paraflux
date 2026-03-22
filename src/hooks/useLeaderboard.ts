@@ -37,6 +37,7 @@ export interface LPEntry {
 export function useTraderLeaderboard() {
   const [data, setData] = useState<TraderEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -69,7 +70,10 @@ export function useTraderLeaderboard() {
       entries.sort((a, b) => b.pnl - a.pnl);
       setData(entries);
     } catch (err) {
-      console.error("[leaderboard] trader fetch error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[leaderboard] trader fetch error:", err);
+      }
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +85,7 @@ export function useTraderLeaderboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { data, isLoading, isError: false };
+  return { data, isLoading, isError };
 }
 
 // ─── LP Leaderboard (subgraph + 2 shared RPC calls for share price) ─
@@ -90,6 +94,7 @@ export function useLPLeaderboard() {
   const client = usePublicClient();
   const [data, setData] = useState<LPEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -158,7 +163,10 @@ export function useLPLeaderboard() {
       entries.sort((a, b) => b.poolShare - a.poolShare);
       setData(entries);
     } catch (err) {
-      console.error("[leaderboard] LP fetch error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[leaderboard] LP fetch error:", err);
+      }
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -170,5 +178,5 @@ export function useLPLeaderboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { data, isLoading, isError: false };
+  return { data, isLoading, isError };
 }

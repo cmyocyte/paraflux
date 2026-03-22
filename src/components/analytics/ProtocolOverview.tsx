@@ -57,7 +57,7 @@ export function ProtocolOverview() {
   const totalAssets = useTotalAssets();
   const { longOI, shortOI } = useOpenInterest();
   const insurance = useInsuranceFund();
-  const { protocol } = useAnalyticsData();
+  const { protocol, isError: subgraphError } = useAnalyticsData();
 
   const totalOI =
     longOI !== undefined && shortOI !== undefined
@@ -66,7 +66,7 @@ export function ProtocolOverview() {
 
   const lifetimeVolume = protocol ? parseFloat(protocol.totalVolume) : 0;
   const totalFees = protocol ? parseFloat(protocol.totalFees) : 0;
-  const activePositions = protocol ? protocol.activePositions : "---";
+  const activePositions = protocol ? protocol.activePositions : subgraphError ? "err" : "---";
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -82,11 +82,11 @@ export function ProtocolOverview() {
       />
       <StatCard
         label="Lifetime Volume"
-        value={lifetimeVolume > 0 ? formatCompactUsd(lifetimeVolume) : "---"}
+        value={lifetimeVolume > 0 ? formatCompactUsd(lifetimeVolume) : subgraphError ? "err" : "---"}
       />
       <StatCard
         label="Accumulated Fees"
-        value={totalFees > 0 ? formatCompactUsd(totalFees) : "---"}
+        value={totalFees > 0 ? formatCompactUsd(totalFees) : subgraphError ? "err" : "---"}
       />
       <StatCard
         label="Active Positions"

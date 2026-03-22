@@ -11,6 +11,7 @@ import {
 } from "@/hooks/useAnchorVault";
 import { EXPECTED_CHAIN_ID } from "@/config/contracts";
 import { usdcToNumber, formatUsd } from "@/lib/format";
+import { getTxUrl } from "@/lib/explorer";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -25,7 +26,7 @@ export function AnchorWithdrawForm() {
 
   const { data: userShares } = useAnchorShares();
   const { data: lastDeposit } = useAnchorLastDeposit();
-  const { redeem, isPending, isConfirming, isSuccess, error: redeemError, reset } = useAnchorRedeem();
+  const { redeem, isPending, isConfirming, isSuccess, error: redeemError, hash, reset } = useAnchorRedeem();
 
   const sharesNum = parseFloat(sharesInput) || 0;
   const sharesBigInt = BigInt(Math.floor(sharesNum * 1e6)) * 10n ** 12n;
@@ -65,6 +66,16 @@ export function AnchorWithdrawForm() {
           <p className="mt-2 text-sm text-zinc-400">
             USDC has been returned to your wallet.
           </p>
+          {hash && (
+            <a
+              href={getTxUrl(hash, chainId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              View transaction
+            </a>
+          )}
           <Button
             className="mt-4"
             variant="secondary"

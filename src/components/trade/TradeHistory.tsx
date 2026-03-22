@@ -4,12 +4,8 @@ import { useChainId } from "wagmi";
 import { useTradeHistoryContext } from "@/context/TradeHistoryContext";
 import type { TradeEvent } from "@/hooks/useTradeHistory";
 import { formatUsd } from "@/lib/format";
+import { getExplorerBase } from "@/lib/explorer";
 import { clsx } from "clsx";
-
-const EXPLORER_URL: Record<number, string> = {
-  999: "https://hyperscan.xyz",
-  998: "https://testnet.purrsec.com",
-};
 
 function typeLabel(type: TradeEvent["type"]): string {
   switch (type) {
@@ -120,7 +116,7 @@ function TradeRow({ trade, explorerBase }: { trade: TradeEvent; explorerBase: st
 
 export function TradeHistory() {
   const chainId = useChainId();
-  const explorerBase = EXPLORER_URL[chainId] ?? EXPLORER_URL[998];
+  const explorerBase = getExplorerBase(chainId);
   const { trades } = useTradeHistoryContext();
 
   if (trades.length === 0) {

@@ -143,7 +143,9 @@ export function useTradeHistory() {
           });
         }
       } catch (err) {
-        console.error("[trade-history] subgraph liquidation fetch error:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("[trade-history] subgraph liquidation fetch error:", err);
+        }
       } finally {
         pollingRef.current = false;
       }
@@ -226,7 +228,7 @@ export function useTradeHistory() {
 
           // Check LiquidationEngine events
           if (
-            CONTRACTS.liquidationEngine !== "0x" &&
+            CONTRACTS.liquidationEngine !== "0x0000000000000000000000000000000000000000" &&
             log.address.toLowerCase() ===
               CONTRACTS.liquidationEngine.toLowerCase()
           ) {
@@ -269,7 +271,9 @@ export function useTradeHistory() {
           });
         }
       } catch (err) {
-        console.error("Failed to record trade:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Failed to record trade:", err);
+        }
       }
     },
     [address, client]

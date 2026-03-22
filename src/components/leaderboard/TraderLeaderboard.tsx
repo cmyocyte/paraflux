@@ -12,7 +12,7 @@ export function TraderLeaderboard() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useTraderLeaderboard();
+  const { data, isLoading, isError } = useTraderLeaderboard();
 
   useEffect(() => {
     setPage(1);
@@ -76,6 +76,15 @@ export function TraderLeaderboard() {
                     <div className="h-3 w-3 animate-spin rounded-full border-2 border-zinc-600 border-t-[#22c55e]" />
                     Scanning on-chain activity...
                   </div>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-3 py-8 text-center text-xs text-red-400"
+                >
+                  Failed to load leaderboard data. Try again later.
                 </td>
               </tr>
             ) : pageData.length > 0 ? (

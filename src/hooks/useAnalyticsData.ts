@@ -17,6 +17,7 @@ export interface AnalyticsData {
   liquidations: SubgraphLiquidation[];
   fundingSnapshots: SubgraphFundingSnapshot[];
   isLoading: boolean;
+  isError: boolean;
 }
 
 /**
@@ -34,6 +35,7 @@ export function useAnalyticsData(): AnalyticsData {
     SubgraphFundingSnapshot[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -48,7 +50,10 @@ export function useAnalyticsData(): AnalyticsData {
       setLiquidations(result.liquidations ?? []);
       setFundingSnapshots(result.fundingSnapshots ?? []);
     } catch (err) {
-      console.error("[analytics] subgraph fetch error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[analytics] subgraph fetch error:", err);
+      }
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -60,5 +65,5 @@ export function useAnalyticsData(): AnalyticsData {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { protocol, liquidations, fundingSnapshots, isLoading };
+  return { protocol, liquidations, fundingSnapshots, isLoading, isError };
 }

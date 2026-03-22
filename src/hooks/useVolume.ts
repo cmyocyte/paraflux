@@ -18,6 +18,7 @@ export function useVolume() {
   const [lifetimeVolume, setLifetimeVolume] = useState(0);
   const [volume24h, setVolume24h] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -31,7 +32,10 @@ export function useVolume() {
         setVolume24h(total);
       }
     } catch (err) {
-      console.error("[volume] fetch error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[volume] fetch error:", err);
+      }
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -43,5 +47,5 @@ export function useVolume() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { lifetimeVolume, volume24h, isLoading };
+  return { lifetimeVolume, volume24h, isLoading, isError };
 }

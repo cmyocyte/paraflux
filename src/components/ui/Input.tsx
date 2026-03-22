@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { clsx } from "clsx";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -13,17 +14,28 @@ export function Input({
   suffix,
   error,
   className,
+  id: externalId,
   ...props
 }: InputProps) {
+  const generatedId = useId();
+  const inputId = externalId ?? generatedId;
+  const errorId = error ? `${inputId}-error` : undefined;
+
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500">
+        <label
+          htmlFor={inputId}
+          className="block text-xs font-bold uppercase tracking-wider text-zinc-500"
+        >
           {label}
         </label>
       )}
       <div className="relative">
         <input
+          id={inputId}
+          aria-describedby={errorId}
+          aria-invalid={error ? true : undefined}
           className={clsx(
             "w-full rounded border border-[#21262d] bg-[#0b0e11] px-2.5 py-1.5 font-mono text-sm text-[#e1e4e8] placeholder-zinc-600 transition-colors focus:border-[#22c55e]/50 focus:outline-none focus:ring-1 focus:ring-[#22c55e]/30",
             suffix && "pr-16",
@@ -38,7 +50,7 @@ export function Input({
           </span>
         )}
       </div>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p id={errorId} className="text-sm text-red-400">{error}</p>}
     </div>
   );
 }
