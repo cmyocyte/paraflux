@@ -4,8 +4,8 @@ import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { usePosition } from "@/hooks/usePosition";
 import { useUserShares, useShareValue } from "@/hooks/useVault";
-import { useAnchorShares, useAnchorShareValue } from "@/hooks/useAnchorVault";
-import { useSurgeShares, useSurgeShareValue } from "@/hooks/useSurge";
+import { useAnchorShares, useAnchorShareValue, useAnchorTotalSupply } from "@/hooks/useAnchorVault";
+import { useSurgeShares, useSurgeShareValue, useSurgeTotalSupply } from "@/hooks/useSurge";
 import { useLPStats } from "@/hooks/useLPStats";
 import { useCurrentIndex } from "@/hooks/useOracle";
 import { wadToNumber, usdcToNumber, formatUsd } from "@/lib/format";
@@ -87,23 +87,39 @@ function LPCard() {
 
 const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
 
-function AnchorCard() {
-  const { data: shares } = useAnchorShares();
-  const { data: value } = useAnchorShareValue(shares);
-
+function VaultCard({
+  title,
+  shares,
+  value,
+  totalSupply,
+  href,
+}: {
+  title: string;
+  shares: bigint | undefined;
+  value: bigint | undefined;
+  totalSupply: bigint | undefined;
+  href: string;
+}) {
   if (!shares || shares === 0n) return null;
-  if (CONTRACTS.anchorVault === ZERO_ADDR) return null;
 
+  const sharesNum = Number(shares) / 1e6;
   const valueUsd = value ? usdcToNumber(value) : 0;
+  // Approximate P&L: value vs shares-at-par (1 share = 1 USDC at initial deposit)
+  const pnl = value ? valueUsd - sharesNum : null;
+  const roi = pnl !== null && sharesNum > 0 ? (pnl / sharesNum) * 100 : null;
+  const poolShare =
+    totalSupply && totalSupply > 0n
+      ? (Number(shares) / Number(totalSupply)) * 100
+      : 0;
 
   return (
     <Card>
-      <CardTitle>Anchor Position</CardTitle>
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
+      <CardTitle>{title}</CardTitle>
+      <div className="mt-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Shares</p>
           <p className="font-mono font-medium text-[#e1e4e8]">
-            {(Number(shares) / 1e6).toFixed(4)}
+            {sharesNum.toFixed(4)}
           </p>
         </div>
         <div>
@@ -113,57 +129,79 @@ function AnchorCard() {
           </p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Strategy</p>
-          <p className="font-mono font-medium text-[#e1e4e8]">Delta-Neutral</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">P&L</p>
+          <p
+            className={clsx(
+              "font-mono font-medium",
+              pnl === null
+                ? "text-[#e1e4e8]"
+                : pnl >= 0
+                  ? "text-[#22c55e]"
+                  : "text-red-400"
+            )}
+          >
+            {pnl !== null ? (
+              <>
+                {pnl >= 0 ? "+" : ""}{formatUsd(pnl)}
+                {roi !== null && (
+                  <span className="ml-1 text-[10px] text-zinc-500">
+                    ({roi >= 0 ? "+" : ""}{roi.toFixed(1)}%)
+                  </span>
+                )}
+              </>
+            ) : "\u2014"}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Pool Share</p>
+          <p className="font-mono font-medium text-[#e1e4e8]">
+            {poolShare.toFixed(2)}%
+          </p>
         </div>
       </div>
       <Link
-        href="/earn"
+        href={href}
         className="mt-4 block text-center text-xs font-medium text-[#22c55e] hover:text-[#22c55e]/70 transition-colors"
       >
-        Manage Anchor position &rarr;
+        Manage position &rarr;
       </Link>
     </Card>
+  );
+}
+
+function AnchorCard() {
+  const { data: shares } = useAnchorShares();
+  const { data: value } = useAnchorShareValue(shares);
+  const { data: totalSupply } = useAnchorTotalSupply();
+
+  if (CONTRACTS.anchorVault === ZERO_ADDR) return null;
+
+  return (
+    <VaultCard
+      title="Anchor Position"
+      shares={shares}
+      value={value}
+      totalSupply={totalSupply}
+      href="/earn"
+    />
   );
 }
 
 function SurgeCard() {
   const { data: shares } = useSurgeShares();
   const { data: value } = useSurgeShareValue(shares);
+  const { data: totalSupply } = useSurgeTotalSupply();
 
-  if (!shares || shares === 0n) return null;
   if (CONTRACTS.surgeVault === ZERO_ADDR) return null;
 
-  const valueUsd = value ? usdcToNumber(value) : 0;
-
   return (
-    <Card>
-      <CardTitle>Surge Position</CardTitle>
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Shares</p>
-          <p className="font-mono font-medium text-[#e1e4e8]">
-            {(Number(shares) / 1e6).toFixed(4)}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Value</p>
-          <p className="font-mono font-medium text-[#e1e4e8]">
-            {value ? formatUsd(valueUsd) : "\u2014"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Strategy</p>
-          <p className="font-mono font-medium text-[#e1e4e8]">Leveraged Long</p>
-        </div>
-      </div>
-      <Link
-        href="/earn"
-        className="mt-4 block text-center text-xs font-medium text-[#22c55e] hover:text-[#22c55e]/70 transition-colors"
-      >
-        Manage Surge position &rarr;
-      </Link>
-    </Card>
+    <VaultCard
+      title="Surge Position"
+      shares={shares}
+      value={value}
+      totalSupply={totalSupply}
+      href="/earn"
+    />
   );
 }
 
