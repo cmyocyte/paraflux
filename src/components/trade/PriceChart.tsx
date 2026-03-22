@@ -54,15 +54,15 @@ export function PriceChart({ className }: PriceChartProps) {
   const { candles, volumes, loading, error, dataVersion, loadMore, loadingMore } =
     useHyperliquidCandles(hlInterval);
 
-  // Derive S² candles from spot OHLCV (the instrument traders are actually trading)
+  // Derive S²/NORM candles from spot OHLCV — matches the protocol index (S²/100)
   const indexCandles = useMemo<CandlestickData<UTCTimestamp>[]>(
     () =>
       candles.map((c) => ({
         time: c.time,
-        open: c.open * c.open,
-        high: c.high * c.high,
-        low: c.low * c.low,
-        close: c.close * c.close,
+        open: (c.open * c.open) / NORM_NUM,
+        high: (c.high * c.high) / NORM_NUM,
+        low: (c.low * c.low) / NORM_NUM,
+        close: (c.close * c.close) / NORM_NUM,
       })),
     [candles]
   );
@@ -114,7 +114,7 @@ export function PriceChart({ className }: PriceChartProps) {
       },
     });
 
-    // S² Power Index candles (primary — this is what traders trade)
+    // S²/NORM Power Index candles (protocol index — matches positions table)
     const candleSeries = chart.addSeries(CandlestickSeries, {
       upColor: "#22c55e",
       downColor: "#ef4444",
@@ -212,9 +212,9 @@ export function PriceChart({ className }: PriceChartProps) {
       const entryIndex = wadToNumber(position.entryIndex);
       const collateral = wadToNumber(position.collateral);
 
-      // Entry line in S² chart space (index * NORM)
+      // Entry line — chart is now in protocol index space (S²/NORM)
       const entryLine = series.createPriceLine({
-        price: entryIndex * NORM_NUM,
+        price: entryIndex,
         color: isLong ? "#22c55e" : "#ef4444",
         lineWidth: 1,
         lineStyle: LineStyle.Dashed,
@@ -244,7 +244,7 @@ export function PriceChart({ className }: PriceChartProps) {
 
       if (liqIndex > 0) {
         const liqLine = series.createPriceLine({
-          price: liqIndex * NORM_NUM,
+          price: liqIndex,
           color: "#f97316",
           lineWidth: 1,
           lineStyle: LineStyle.Dashed,
@@ -259,11 +259,11 @@ export function PriceChart({ className }: PriceChartProps) {
     addPositionLines(shortPos, false);
   }, [longPos, shortPos, cumFunding]);
 
-  // Latest values for header display
+  // Latest values for header display (S²/NORM = protocol index)
   const lastCandle = candles.length > 0 ? candles[candles.length - 1] : null;
-  const lastIndex = lastCandle ? lastCandle.close * lastCandle.close : null;
+  const lastIndex = lastCandle ? (lastCandle.close * lastCandle.close) / NORM_NUM : null;
   const prevCandle = candles.length > 1 ? candles[candles.length - 2] : null;
-  const prevIndex = prevCandle ? prevCandle.close * prevCandle.close : null;
+  const prevIndex = prevCandle ? (prevCandle.close * prevCandle.close) / NORM_NUM : null;
   const indexChange =
     lastIndex !== null && prevIndex !== null && prevIndex !== 0
       ? ((lastIndex - prevIndex) / prevIndex) * 100
@@ -306,7 +306,7 @@ export function PriceChart({ className }: PriceChartProps) {
         </div>
       </div>
 
-      {/* Chart: S² candles + volume + spot reference line */}
+      {/* Chart: S²/NORM candles + volume + spot reference line */}
       <div ref={containerRef} className={className ?? "h-[420px]"} />
     </div>
   );

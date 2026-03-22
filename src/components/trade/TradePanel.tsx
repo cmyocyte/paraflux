@@ -26,6 +26,9 @@ import { clsx } from "clsx";
 function extractErrorMessage(error: Error | null): string | null {
   if (!error) return null;
   const msg = error.message ?? String(error);
+  // RPC rate limiting (HyperEVM testnet)
+  if (msg.includes("rate limit") || msg.includes("-32005"))
+    return "RPC rate limited — please wait a moment and retry";
   // Viem wraps revert reasons like: "... reverted with the following reason: XYZ"
   const revertMatch = msg.match(/reason:\s*(.+?)(?:\n|$)/i);
   if (revertMatch) return revertMatch[1].trim();
@@ -38,6 +41,9 @@ function extractErrorMessage(error: Error | null): string | null {
   // Gas estimation
   if (msg.includes("gas") && msg.includes("exceeds"))
     return "Transaction would revert (gas estimation failed)";
+  // Generic Internal JSON-RPC error (catch-all for RPC issues)
+  if (msg.includes("Internal JSON-RPC error"))
+    return "RPC error — please retry";
   // Truncate long messages
   if (msg.length > 120) return msg.slice(0, 120) + "...";
   return msg;
@@ -46,7 +52,9 @@ function extractErrorMessage(error: Error | null): string | null {
 const DEMO_INDEX = 600;
 const SIZE_PCTS = [25, 50, 75, 100] as const;
 const LEVERAGE_OPTIONS = [1, 2, 3] as const;
-const SLIPPAGE_OPTIONS = [0.1, 0.5, 1.0] as const;
+/** Hardcoded slippage tolerance (1%). Oracle-priced, so no AMM slippage —
+ *  this only guards against price movement between signing and execution. */
+const SLIPPAGE_FRACTION = 0.01;
 
 export function TradePanel() {
   const { isConnected, address } = useAccount();
@@ -58,7 +66,6 @@ export function TradePanel() {
   const [isLong, setIsLong] = useState(true);
   const [sizeInput, setSizeInput] = useState("");
   const [leverageInput, setLeverageInput] = useState("1");
-  const [slippageInput, setSlippageInput] = useState("0.5");
   const [txStatus, setTxStatus] = useState<{
     type: "success" | "error";
     message: string;
@@ -207,21 +214,19 @@ export function TradePanel() {
     (hasShort ? wadToNumber(shortPos!.collateral) : 0);
 
   const handleSubmit = () => {
-    if (!canTrade) return;
+    if (!canTrade || insufficientBalance) return;
     setTxStatus(null); // Clear previous status
 
     const sizeWad = numberToWad(size);
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 300);
-    const slippage = parseFloat(slippageInput) || 0.5;
-    const slippageFraction = slippage / 100;
 
     if (isLong) {
       // Longs: slippageLimit is a ceiling — reject if index rises above tolerance
-      const slippageLimit = numberToWad(indexValue * (1 + slippageFraction));
+      const slippageLimit = numberToWad(indexValue * (1 + SLIPPAGE_FRACTION));
       openLong(sizeWad, usdcAmount, slippageLimit, deadline);
     } else {
       // Shorts: slippageLimit is a floor — reject if index drops below tolerance
-      const slippageLimit = numberToWad(indexValue * (1 - slippageFraction));
+      const slippageLimit = numberToWad(indexValue * (1 - SLIPPAGE_FRACTION));
       openShort(sizeWad, usdcAmount, slippageLimit, deadline);
     }
   };
@@ -333,41 +338,6 @@ export function TradePanel() {
         </div>
       </div>
 
-      {/* Slippage tolerance */}
-      <div className="mt-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-            Slippage
-          </span>
-          <div className="flex items-center gap-1">
-            {SLIPPAGE_OPTIONS.map((pct) => (
-              <button
-                key={pct}
-                onClick={() => setSlippageInput(String(pct))}
-                className={clsx(
-                  "rounded px-1.5 py-0.5 text-[10px] font-bold transition-colors",
-                  Math.abs((parseFloat(slippageInput) || 0.5) - pct) < 0.01
-                    ? "bg-[#22c55e]/10 text-[#22c55e]"
-                    : "text-zinc-600 hover:text-zinc-400"
-                )}
-              >
-                {pct}%
-              </button>
-            ))}
-            <input
-              type="number"
-              step="0.1"
-              min="0.01"
-              max="10"
-              value={slippageInput}
-              onChange={(e) => setSlippageInput(e.target.value)}
-              className="w-12 rounded bg-[#161b22] px-1 py-0.5 text-right font-mono text-[10px] text-[#e1e4e8] outline-none focus:ring-1 focus:ring-[#22c55e]/30"
-            />
-            <span className="text-[10px] text-zinc-600">%</span>
-          </div>
-        </div>
-      </div>
-
       {/* Margin required */}
       {size > 0 && leverage > 0 && (
         <div className="mt-1.5 flex items-baseline justify-between gap-2">
@@ -407,7 +377,7 @@ export function TradePanel() {
             variant={isLong ? "primary" : "danger"}
             onClick={handleSubmit}
             loading={isOpening}
-            disabled={!canTrade}
+            disabled={!canTrade || insufficientBalance}
           >
             {insufficientBalance
               ? "Insufficient Balance"
