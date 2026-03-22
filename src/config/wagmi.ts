@@ -3,8 +3,8 @@ import { http, fallback } from "wagmi";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 
 const httpOpts = {
-  retryCount: 2,
-  retryDelay: 1000,
+  retryCount: 4,
+  retryDelay: 1500,
   batch: { batchSize: 30, wait: 500 } as const,
 };
 
@@ -61,8 +61,8 @@ export const config = getDefaultConfig({
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "PLACEHOLDER",
   chains: [hyperEVMTestnet, hyperEVM],
   transports: {
-    [hyperEVMTestnet.id]: fallback(testnetTransports),
-    [hyperEVM.id]: fallback(mainnetTransports),
+    [hyperEVMTestnet.id]: fallback(testnetTransports, { rank: true }),
+    [hyperEVM.id]: fallback(mainnetTransports, { rank: true }),
   },
   ssr: true,
 });
