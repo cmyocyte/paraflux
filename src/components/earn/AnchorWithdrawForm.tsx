@@ -29,7 +29,7 @@ export function AnchorWithdrawForm() {
   const { redeem, isPending, isConfirming, isSuccess, error: redeemError, hash, reset } = useAnchorRedeem();
 
   const sharesNum = parseFloat(sharesInput) || 0;
-  const sharesBigInt = BigInt(Math.floor(sharesNum * 1e6)) * 10n ** 12n;
+  const sharesBigInt = BigInt(Math.floor(sharesNum * 1e6));
 
   const { data: previewAssets } = useAnchorShareValue(
     sharesNum > 0 ? sharesBigInt : undefined
